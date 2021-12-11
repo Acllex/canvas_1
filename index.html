@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="index.css" />
+    <title>画线</title>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script>
+      const canvas = document.getElementById("canvas");
+      let is_print = false;
+      let start_arr = [];
+      canvas.width = document.documentElement.clientWidth; // canvas宽度等于窗口宽度
+      canvas.height = document.documentElement.clientHeight; // canvas高度等于窗口高度
+      const ctx = canvas.getContext("2d"); //使用2d
+      ctx.lineWidth = 6;
+      ctx.lineCap = "round"; // 断点处添加圆
+
+      // 画线函数
+      let lines = (x1, y1, x2, y2) => {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1); // 直线开始
+        ctx.lineTo(x2, y2); // 直线结束
+        ctx.stroke(); // stroke描边，fill填充
+      };
+
+      // 判断是鼠标事件，还是触摸事件
+      let is_touch = "ontouchstart" in document;
+      if (is_touch) {
+        //   获取触摸的开始坐标
+        document.ontouchstart = (e) => {
+          start_arr = [e.touches[0].clientX, e.touches[0].clientY];
+        };
+        // 获取触摸的移动坐标
+        document.ontouchmove = (e) => {
+          // 获得当前坐标
+          let move_arr = [e.touches[0].clientX, e.touches[0].clientY];
+          // 画线
+          lines(start_arr[0], start_arr[1], move_arr[0], move_arr[1]);
+          // 将当前坐标赋值为开始坐标
+          start_arr = [move_arr[0], move_arr[1]];
+        };
+      } else {
+        // 按下鼠标开始画线
+        document.onmousedown = (e) => {
+          is_print = true;
+          // 确定开始位置
+          start_arr = [e.clientX, e.clientY];
+        };
+        // 松开鼠标停止画线
+        document.onmouseup = (e) => {
+          is_print = false;
+        };
+        // 画线
+        document.onmousemove = (e) => {
+          if (is_print) {
+            lines(start_arr[0], start_arr[1], e.clientX, e.clientY);
+            start_arr = [e.clientX, e.clientY];
+          }
+        };
+      }
+    </script>
+  </body>
+</html>
